@@ -45,7 +45,7 @@ while True:
     if iterazioni >=1:
         if  result_prices == old_prices:
             print(f"{GetTime()} Nessuna novità...")
-        elif result_prices[0]>=300:
+        elif result_prices[0]>=config.get("maxPrezzo"):
             print(f"{GetTime()} Novità trovata!")
             print(f"{GetTime()} Nuovo Prezzo",result_prices[0])
             playsound("cash.mp3")
