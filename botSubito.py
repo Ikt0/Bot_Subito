@@ -10,11 +10,12 @@ intervallo=config.get("intervalloRicerca")
 # print(f"Testo da ricercare {stringa_ricerca}")
 response = requests.get(url)
 response_content = response.text
-now = str(datetime.now())[:16]
+def GetTime():
+    return str(datetime.now())[:16]
 
 result_prices=[]
 
-def eseguiRicerca():
+def EseguiRicerca():
     start_index=0
     numero_risultati=0
     while True:
@@ -40,18 +41,18 @@ def eseguiRicerca():
 iterazioni = 0
 old_prices=[]
 while True:
-    eseguiRicerca()
+    EseguiRicerca()
     if iterazioni >=1:
         if  result_prices == old_prices:
-            print(f"{now} Nessuna novità...")
+            print(f"{GetTime()} Nessuna novità...")
         elif result_prices[0]>=300:
-            print(f"{now} Novità trovata!")
-            print(f"{now} Nuovo Prezzo",result_prices[0])
+            print(f"{GetTime()} Novità trovata!")
+            print(f"{GetTime()} Nuovo Prezzo",result_prices[0])
             playsound("cash.mp3")
     else:
-        print(f"{now} Prima iterazione...")
-    # print(f"{now} Prezzi trovati precedentemente {old_prices}")
-    # print(f"{now} Nuovi prezzi {result_prices}")
+        print(f"{GetTime()} Prima iterazione...")
+    # print(f"{GetTime()} Prezzi trovati precedentemente {old_prices}")
+    # print(f"{GetTime()} Nuovi prezzi {result_prices}")
     old_prices=result_prices
     result_prices=[]
     time.sleep(intervallo)
