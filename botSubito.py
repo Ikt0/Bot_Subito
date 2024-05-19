@@ -4,6 +4,17 @@ from playsound import playsound
 from configSubitoBot import config
 from datetime import datetime
 
+print("""
+   _____       _     _ _          ____        _     __   ___  
+  / ____|     | |   (_) |        |  _ \      | |   /_ | / _ \ 
+ | (___  _   _| |__  _| |_ ___   | |_) | ___ | |_   | || | | |
+  \___ \| | | | '_ \| | __/ _ \  |  _ < / _ \| __|  | || | | |
+  ____) | |_| | |_) | | || (_) | | |_) | (_) | |_   | || |_| |
+ |_____/ \__,_|_.__/|_|\__\___/  |____/ \___/ \__|  |_(_)___/ 
+ By Ikto                                                            
+                                                              
+""")
+
 url = config.get("urlRicerca")
 stringa_ricerca=config.get("stringaRicerca")
 intervallo=config.get("intervalloRicerca")
@@ -44,13 +55,17 @@ while True:
     EseguiRicerca()
     if iterazioni >=1:
         if  result_prices == old_prices:
-            print(f"{GetTime()} Nessuna novità...")
+            print(f"{GetTime()} Nessuna novità...",end="\r")
         elif result_prices[0]>=config.get("maxPrezzo"):
             print(f"{GetTime()} Novità trovata!")
             print(f"{GetTime()} Nuovo Prezzo",result_prices[0])
             playsound("cash.mp3")
+        elif result_prices[0]<config.get("maxPrezzo"):
+            print(f"{GetTime()} Novità trovata ma il prezzo è troppo alto!")
+            print(f"{GetTime()} Prezzo:",result_prices[0])
+            playsound("cash.mp3")  
     else:
-        print(f"{GetTime()} Prima iterazione...")
+        print(f"{GetTime()} Prima iterazione...",end="\r")
     # print(f"{GetTime()} Prezzi trovati precedentemente {old_prices}")
     # print(f"{GetTime()} Nuovi prezzi {result_prices}")
     old_prices=result_prices
