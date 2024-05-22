@@ -102,14 +102,14 @@ while True:
         elif set(result_prices) != set(old_prices) and int(reserch_results[0]['price'].split(' ')[0]) <= config.get("maxPrezzo"):
             print(f"{GetTime()} Novità trovata!")
             print(f"{GetTime()} Nuovo Prezzo: {reserch_results[0]['price']}, Titolo: {reserch_results[0]['title']}, Descrizione: {reserch_results[0]['desc']}")
-            # playsound(os.path.abspath("cash.mp3"))
+            playsound("cash.mp3")
             conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(reserch_results[0]['price'].split(' ')[0])}, 'GOOD', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
             conn.commit()
             old_prices = result_prices
         elif set(result_prices) != set(old_prices) and int(reserch_results[0]['price'].split(' ')[0]) > config.get("maxPrezzo"):
             print(f"{GetTime()} Novità trovata ma il prezzo è troppo alto!")
             print(f"{GetTime()} Prezzo: {reserch_results[0]['price']}, Titolo: {reserch_results[0]['title']}")
-            # playsound(os.path.abspath("cash.mp3"))
+            playsound("cash.mp3")
             conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(reserch_results[0]['price'].split(' ')[0])}, 'TOO_HIGH', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
             conn.commit()
             old_prices = result_prices
@@ -118,5 +118,5 @@ while True:
         conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(reserch_results[0]['price'].split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
         conn.commit()
     old_prices = result_prices
-    time.sleep(intervallo_ricerca)
     iterazioni += 1
+    time.sleep(intervallo_ricerca)
