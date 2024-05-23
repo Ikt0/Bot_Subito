@@ -2,6 +2,7 @@ import json
 import time
 import requests
 from playsound import playsound
+#playsound 1.2.2
 from config_subito import config
 from datetime import datetime
 import sqlite3
@@ -79,10 +80,13 @@ item_number INTEGER PRIMARY KEY AUTOINCREMENT,
 prezzo INT,
 titolo varchar(50),
 descrizione varchar(500),
+status varchar(50),
 is_sold varchar(50),
 data timestamp default CURRENT_TIMESTAMP
 );""")
         # print(f"sqllite ver: {sqlite3.sqlite_version}")
+        conn.execute("""DELETE FROM andamento""")
+        conn.commit()
     except sqlite3.Error as e:
         print(e)
     finally:
@@ -93,7 +97,7 @@ data timestamp default CURRENT_TIMESTAMP
 if __name__ == '__main__':
     create_sqlite_database("subito.db")
 
-def GetTime():
+def get_time():
     return str(datetime.now())[:16]
 
 
@@ -113,7 +117,10 @@ while True:
     if iterazioni >= 1:
         if latest_price == old_price:
             restart_graphics()
-            print(f"{GetTime()} Nessuna novità, ultimo prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}, {reserch_results[0]['is_sold']}", end="\r")
+            print(f"{get_time()} Nessuna novità\n-----\nUltimo articolo:\n-----")
+            print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
+            print(f"Prezzo:\n{latest_price}\n-----")
+            print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
             # conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(latest_price.split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
             # conn.commit()
             # for elem in reserch_results:
@@ -122,23 +129,26 @@ while True:
             # print(latest_price,old_price)
         elif latest_price != old_price and int(latest_price.split(' ')[0]) <= config.get("max_prezzo"):
             restart_graphics()
-            print(f"{GetTime()} Novità trovata!")
-            print(f"{GetTime()} Nuovo Prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}, Descrizione: {reserch_results[0]['desc']}")
+            print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
+            print(f"Prezzo:\n{latest_price}\n-----")
+            print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
             playsound("cash.mp3")
-            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(latest_price.split(' ')[0])}, 'GOOD', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
+            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}', 'GOOD', '{get_time()}')")
             conn.commit()
             old_price = latest_price
         elif latest_price != old_price and int(latest_price.split(' ')[0]) > config.get("max_prezzo"):
             restart_graphics()
-            print(f"{GetTime()} Novità trovata ma il prezzo è troppo alto!")
-            print(f"{GetTime()} Prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}")
+            print(f"{get_time()} Novità trovata ma il prezzo è troppo alto!\n-----")
+            print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
+            print(f"Prezzo:\n{latest_price}\n-----")
+            print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
             playsound("cash.mp3")
-            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(latest_price.split(' ')[0])}, 'TOO_HIGH', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
+            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}', 'TOO_HIGH', '{get_time()}')")
             conn.commit()
             old_price = latest_price
     else:
-        print(f"{GetTime()} Prima iterazione...")
-        conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(latest_price.split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
+        print(f"{get_time()} Prima iterazione, attendi {intervallo_ricerca} secondi...")
+        conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}', 'SAME', '{get_time()}')")
         conn.commit()
     old_price = reserch_results[0]["price"]
     iterazioni += 1
