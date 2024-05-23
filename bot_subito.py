@@ -5,18 +5,30 @@ from playsound import playsound
 from config_subito import config
 from datetime import datetime
 import sqlite3
-from pathlib import os
 from bs4 import BeautifulSoup
+import os
 
-print("""
-   _____       _     _ _          _           _     __   ___  
-  / ____|     | |   (_) |        | |         | |   /_ | |__ \ 
- | (___  _   _| |__  _| |_ ___   | |__   ___ | |_   | |    ) |
-  \___ \| | | | '_ \| | __/ _ \  | '_ \ / _ \| __|  | |   / / 
-  ____) | |_| | |_) | | || (_) | | |_) | (_) | |_   | |_ / /_ 
- |_____/ \__,_|_.__/|_|\__\___/  |_.__/ \___/ \__|  |_(_)____|
- By Ikto                                                            
+def print_logo():
+    print("""
+┏┓  ┓ •     ┳┓     ┓ ┏━
+┗┓┓┏┣┓┓╋┏┓  ┣┫┏┓╋  ┃ ┗┓
+┗┛┗┻┗┛┗┗┗┛  ┻┛┗┛┗  ┻•┗┛
 """)
+#tmplr
+    
+def clear_CMD():
+    try:
+        os.system('cls')
+        pass
+    except:
+        print("Error running command")
+        pass
+
+def restart_graphics():
+    clear_CMD()
+    print_logo()
+
+restart_graphics()
 
 url_ricerca = config.get("url_ricerca")
 maxPrezzo = config.get("maxPrezzo")
@@ -66,7 +78,7 @@ CREATE TABLE IF NOT EXISTS andamento (
 item_number INTEGER PRIMARY KEY AUTOINCREMENT,
 prezzo INT,
 titolo varchar(50),
-descrizione varchar(50),
+descrizione varchar(500),
 is_sold varchar(50),
 data timestamp default CURRENT_TIMESTAMP
 );""")
@@ -86,37 +98,48 @@ def GetTime():
 
 
 iterazioni = 0
-old_prices = []
-result_prices=[]
+old_price = []
+latest_price=[]
 
 results_array=["title","desc","price","is_sold"]
 
 
 while True:
-    reserch_results = esegui_ricerca()
+    try:
+        reserch_results = esegui_ricerca()
+        latest_price=reserch_results[0]["price"]
+    except:
+        print("Impossibile effettuare la ricerca")
     if iterazioni >= 1:
-        if set(result_prices) == set(old_prices):
-            print(f"{GetTime()} Nessuna novità, ultimo prezzo: {reserch_results[0]['price']}, Titolo: {reserch_results[0]['title']}", end="\r")
-            # conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(reserch_results[0]['price'].split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
+        if latest_price == old_price:
+            restart_graphics()
+            print(f"{GetTime()} Nessuna novità, ultimo prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}", end="\r")
+            # conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(latest_price.split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
             # conn.commit()
-        elif set(result_prices) != set(old_prices) and int(reserch_results[0]['price'].split(' ')[0]) <= config.get("maxPrezzo"):
+            # for elem in reserch_results:
+            #     print(elem["title"],elem["price"],elem["is_sold"])
+            # print("__________________________________________________________")
+            # print(latest_price,old_price)
+        elif latest_price != old_price and int(latest_price.split(' ')[0]) <= config.get("maxPrezzo"):
+            restart_graphics()
             print(f"{GetTime()} Novità trovata!")
-            print(f"{GetTime()} Nuovo Prezzo: {reserch_results[0]['price']}, Titolo: {reserch_results[0]['title']}, Descrizione: {reserch_results[0]['desc']}")
+            print(f"{GetTime()} Nuovo Prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}, Descrizione: {reserch_results[0]['desc']}")
             playsound("cash.mp3")
-            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(reserch_results[0]['price'].split(' ')[0])}, 'GOOD', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
+            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(latest_price.split(' ')[0])}, 'GOOD', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
             conn.commit()
-            old_prices = result_prices
-        elif set(result_prices) != set(old_prices) and int(reserch_results[0]['price'].split(' ')[0]) > config.get("maxPrezzo"):
+            old_price = latest_price
+        elif latest_price != old_price and int(latest_price.split(' ')[0]) > config.get("maxPrezzo"):
+            restart_graphics()
             print(f"{GetTime()} Novità trovata ma il prezzo è troppo alto!")
-            print(f"{GetTime()} Prezzo: {reserch_results[0]['price']}, Titolo: {reserch_results[0]['title']}")
+            print(f"{GetTime()} Prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}")
             playsound("cash.mp3")
-            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(reserch_results[0]['price'].split(' ')[0])}, 'TOO_HIGH', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
+            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(latest_price.split(' ')[0])}, 'TOO_HIGH', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
             conn.commit()
-            old_prices = result_prices
+            old_price = latest_price
     else:
         print(f"{GetTime()} Prima iterazione...")
-        conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(reserch_results[0]['price'].split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
+        conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(latest_price.split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
         conn.commit()
-    old_prices = result_prices
+    old_price = reserch_results[0]["price"]
     iterazioni += 1
     time.sleep(intervallo_ricerca)
