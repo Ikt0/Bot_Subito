@@ -31,7 +31,7 @@ def restart_graphics():
 restart_graphics()
 
 url_ricerca = config.get("url_ricerca")
-maxPrezzo = config.get("maxPrezzo")
+max_prezzo = config.get("max_prezzo")
 intervallo_ricerca = config.get("intervallo_ricerca")
 
 def esegui_ricerca():
@@ -54,7 +54,7 @@ def esegui_ricerca():
             print("Non è stato possibile estrarre i dati")
 
         try:
-            is_sold = json_content['props']['pageProps']['initialState']['items']['list'][i]['item']['features']['/transaction_is_sold']['values'][0]['value']
+            is_sold = json_content['props']['pageProps']['initialState']['items']['list'][i]['item']['features']['/transaction_status']['values'][0]['value']
         except:
             is_sold = "DISPONIBILE"
 
@@ -113,14 +113,14 @@ while True:
     if iterazioni >= 1:
         if latest_price == old_price:
             restart_graphics()
-            print(f"{GetTime()} Nessuna novità, ultimo prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}", end="\r")
+            print(f"{GetTime()} Nessuna novità, ultimo prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}, {reserch_results[0]['is_sold']}", end="\r")
             # conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(latest_price.split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
             # conn.commit()
             # for elem in reserch_results:
             #     print(elem["title"],elem["price"],elem["is_sold"])
             # print("__________________________________________________________")
             # print(latest_price,old_price)
-        elif latest_price != old_price and int(latest_price.split(' ')[0]) <= config.get("maxPrezzo"):
+        elif latest_price != old_price and int(latest_price.split(' ')[0]) <= config.get("max_prezzo"):
             restart_graphics()
             print(f"{GetTime()} Novità trovata!")
             print(f"{GetTime()} Nuovo Prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}, Descrizione: {reserch_results[0]['desc']}")
@@ -128,7 +128,7 @@ while True:
             conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, data) VALUES ({int(latest_price.split(' ')[0])}, 'GOOD', '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}')")
             conn.commit()
             old_price = latest_price
-        elif latest_price != old_price and int(latest_price.split(' ')[0]) > config.get("maxPrezzo"):
+        elif latest_price != old_price and int(latest_price.split(' ')[0]) > config.get("max_prezzo"):
             restart_graphics()
             print(f"{GetTime()} Novità trovata ma il prezzo è troppo alto!")
             print(f"{GetTime()} Prezzo: {latest_price}, Titolo: {reserch_results[0]['title']}")
