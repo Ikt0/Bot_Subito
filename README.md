@@ -20,10 +20,15 @@ Notifiche Personalizzate: Riproduce un suono e stampa informazioni nella console
 Modifica questo file per gestire le configurazioni del bot
 
 "url_ricerca":"Url di ricerca di un articolo su Subito.it elencato per più recente",
+
 "intervallo_ricerca":int in secondi d'aggiornamento tra una richiesta e un altra (consigliati 20 secondi),
+
 "max_prezzo": int Il massimo del prezzo desiderato,
+
 "clear_database_on_startup":"Booleano per resettare o meno il database all'avvio del bot",
+
 "plot_data":"Apre un plotter per visualizzare l'andamento dei prezzi durante l'esecuzione del bot"
+
 
 #### Avviare il bot
 
