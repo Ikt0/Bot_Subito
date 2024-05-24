@@ -136,6 +136,7 @@ while True:
             print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
             print(f"Prezzo:\n{latest_price}\n-----")
             print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
+            print(f"Disponibilità:\n{reserch_results[0]['is_sold']}\n-----")
             # conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(latest_price.split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
             # conn.commit()
             # for elem in reserch_results:
@@ -150,6 +151,7 @@ while True:
             print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
             print(f"Prezzo:\n{latest_price}\n-----")
             print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
+            print(f"Disponibilità:\n{reserch_results[0]['is_sold']}\n-----")
             playsound("cash.mp3")
             conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}', 'GOOD', '{get_time()}')")
             conn.commit()
@@ -160,6 +162,7 @@ while True:
             print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
             print(f"Prezzo:\n{latest_price}\n-----")
             print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
+            print(f"Disponibilità:\n{reserch_results[0]['is_sold']}\n-----")
             playsound("cash.mp3")
             conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}', 'TOO_HIGH', '{get_time()}')")
             conn.commit()
