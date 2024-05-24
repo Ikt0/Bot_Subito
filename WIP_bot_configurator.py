@@ -1,10 +1,5 @@
 from config_subito import config
 
-# config={
-#     "url_ricerca":"https://www.subito.it/annunci-italia/vendita/usato/?q=steam+deck&from=recentsearches",
-#     "intervallo_ricerca":20,
-#     "max_prezzo":300
-# }
 while True:
     user_input=input(f"Cosa hai intenzione di configurare?\n1)url_ricerca\n2)intervallo_ricerca\n3)max_prezzo\n")
     match user_input:
