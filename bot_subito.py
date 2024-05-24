@@ -8,12 +8,14 @@ from datetime import datetime
 import sqlite3
 from bs4 import BeautifulSoup
 import os
+from visualizzazione_dati import data_graph
 
 def print_logo():
     print("""
 ┏┓  ┓ •     ┳┓     ┓ ┏━
 ┗┓┓┏┣┓┓╋┏┓  ┣┫┏┓╋  ┃ ┗┓
 ┗┛┗┻┗┛┗┗┗┛  ┻┛┗┛┗  ┻•┗┛
+by. Ikto
 """)
 #tmplr
     
@@ -85,8 +87,10 @@ is_sold varchar(50),
 data timestamp default CURRENT_TIMESTAMP
 );""")
         # print(f"sqllite ver: {sqlite3.sqlite_version}")
-        conn.execute("""DELETE FROM andamento""")
-        conn.commit()
+        if config.get("clear_database_on_startup")=="True":
+            conn.execute("""DELETE FROM andamento""")
+            conn.commit()
+
     except sqlite3.Error as e:
         print(e)
     finally:
@@ -100,6 +104,17 @@ if __name__ == '__main__':
 def get_time():
     return str(datetime.now())[:16]
 
+def plot_data():
+    try:
+        cur = conn.cursor()
+        cur.execute("""SELECT item_number,prezzo FROM andamento""")
+
+        ritultato=cur.fetchall()
+
+        data_graph(ritultato)
+    except:
+        print("Plotting non disponibile")
+    
 
 iterazioni = 0
 old_price = []
@@ -127,6 +142,9 @@ while True:
             #     print(elem["title"],elem["price"],elem["is_sold"])
             # print("__________________________________________________________")
             # print(latest_price,old_price)
+            if config.get("plot_data")=="True":
+                plot_data()#da commentare per non creare un diagramma dei prezzi
+                
         elif latest_price != old_price and int(latest_price.split(' ')[0]) <= config.get("max_prezzo"):
             restart_graphics()
             print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
