@@ -50,19 +50,25 @@ def esegui_ricerca():
     results = []
     for i in range(len(json_content["props"]["pageProps"]["initialState"]["items"]["list"])):
         try:
-            title = json_content["props"]["pageProps"]["initialState"]["items"]["list"][i]["item"]["subject"]
-            desc = json_content["props"]["pageProps"]["initialState"]["items"]["list"][i]["item"]["body"]
-            price = json_content["props"]["pageProps"]["initialState"]["items"]["list"][i]["item"]["features"]["/price"]["values"][0]["value"]
+            title = json_content["props"]["pageProps"]["initialState"]["items"]["list"][i]["item"]["subject"].replace("'","")
+            try:
+                desc = json_content["props"]["pageProps"]["initialState"]["items"]["list"][i]["item"]["body"].replace("'","")
+            except:
+                desc= "Descrizione non disponibile"
+            try:
+                price = json_content["props"]["pageProps"]["initialState"]["items"]["list"][i]["item"]["features"]["/price"]["values"][0]["value"]
+            except:
+                price = "0 €"
         except:
             print("Non è stato possibile estrarre i dati")
 
         try:
             is_sold = json_content['props']['pageProps']['initialState']['items']['list'][i]['item']['features']['/transaction_status']['values'][0]['value']
         except:
-            is_sold = "DISPONIBILE"
+            is_sold = "Disponibile"
 
-        if is_sold!="DISPONIBILE":
-            is_sold = "VENDUTO"
+        if is_sold!="Disponibile":
+            is_sold = "Venduto"
 
         results.append({"title": title,"desc": desc,"price": price,"is_sold": is_sold})
 
@@ -81,13 +87,13 @@ CREATE TABLE IF NOT EXISTS andamento (
 item_number INTEGER PRIMARY KEY AUTOINCREMENT,
 prezzo INT,
 titolo varchar(50),
-descrizione varchar(500),
+descrizione varchar(1000),
 status varchar(50),
 is_sold varchar(50),
 data timestamp default CURRENT_TIMESTAMP
 );""")
         # print(f"sqllite ver: {sqlite3.sqlite_version}")
-        if config.get("clear_database_on_startup")=="True":
+        if config.get("clear_database_on_startup").lower()=="true":
             conn.execute("""DELETE FROM andamento""")
             conn.commit()
 
@@ -109,12 +115,12 @@ def plot_data():
         cur = conn.cursor()
         cur.execute("""SELECT item_number,prezzo FROM andamento""")
 
-        ritultato=cur.fetchall()
+        risultato=cur.fetchall()
 
-        data_graph(ritultato)
+        data_graph(risultato)
     except:
         print("Plotting non disponibile")
-    
+
 
 iterazioni = 0
 old_price = []
@@ -135,25 +141,25 @@ while True:
             print(f"{get_time()} Nessuna novità\n-----\nUltimo articolo:\n-----")
             print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
             print(f"Prezzo:\n{latest_price}\n-----")
-            print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
+            print(f"Descrizione:\n{reserch_results[0]['desc'].replace("'","")}\n-----")
             print(f"Disponibilità:\n{reserch_results[0]['is_sold']}\n-----")
-            # conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(latest_price.split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc']}','{reserch_results[0]['is_sold']}')")
+            # conn.execute(f"INSERT INTO andamento (prezzo,titolo,descrizione,is_sold,data) VALUES({int(latest_price.split(' ')[0])},'SAME','{reserch_results[0]['title']}','{reserch_results[0]['desc'].replace("'","")}','{reserch_results[0]['is_sold']}')")
             # conn.commit()
             # for elem in reserch_results:
             #     print(elem["title"],elem["price"],elem["is_sold"])
             # print("__________________________________________________________")
             # print(latest_price,old_price)
-            if config.get("plot_data")=="True":
+            if config.get("plot_data").lower()=="true":
                 plot_data()#da commentare per non creare un diagramma dei prezzi
                 
         elif latest_price != old_price and int(latest_price.split(' ')[0]) <= config.get("max_prezzo"):
             restart_graphics()
             print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
             print(f"Prezzo:\n{latest_price}\n-----")
-            print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
+            print(f"Descrizione:\n{reserch_results[0]['desc'].replace("'","")}\n-----")
             print(f"Disponibilità:\n{reserch_results[0]['is_sold']}\n-----")
             playsound("cash.mp3")
-            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}', 'GOOD', '{get_time()}')")
+            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc'].replace("'","")}', '{reserch_results[0]['is_sold']}', 'GOOD', '{get_time()}')")
             conn.commit()
             old_price = latest_price
         elif latest_price != old_price and int(latest_price.split(' ')[0]) > config.get("max_prezzo"):
@@ -161,10 +167,10 @@ while True:
             print(f"{get_time()} Novità trovata ma il prezzo è troppo alto!\n-----")
             print(f"Titolo:\n{reserch_results[0]['title']}\n-----")
             print(f"Prezzo:\n{latest_price}\n-----")
-            print(f"Descrizione:\n{reserch_results[0]['desc']}\n-----")
+            print(f"Descrizione:\n{reserch_results[0]['desc'].replace("'","")}\n-----")
             print(f"Disponibilità:\n{reserch_results[0]['is_sold']}\n-----")
             playsound("cash.mp3")
-            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc']}', '{reserch_results[0]['is_sold']}', 'TOO_HIGH', '{get_time()}')")
+            conn.execute(f"INSERT INTO andamento (prezzo, titolo, descrizione, is_sold, status, data) VALUES ({int(latest_price.split(' ')[0])}, '{reserch_results[0]['title']}', '{reserch_results[0]['desc'].replace("'","")}', '{reserch_results[0]['is_sold']}', 'TOO_HIGH', '{get_time()}')")
             conn.commit()
             old_price = latest_price
     else:

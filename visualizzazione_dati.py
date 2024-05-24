@@ -2,13 +2,7 @@ import matplotlib.pyplot as plt
 import sqlite3
 
 
-def data_graph():
-
-    conn = sqlite3.connect("subito.db")
-    cur = conn.cursor()
-    cur.execute("""SELECT item_number,prezzo FROM andamento""")
-
-    risultato=cur.fetchall()
+def data_graph(risultato):
 
     x=[]
     y=[]
